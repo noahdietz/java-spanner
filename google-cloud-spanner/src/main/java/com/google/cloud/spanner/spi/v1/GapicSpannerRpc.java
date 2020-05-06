@@ -226,6 +226,7 @@ public class GapicSpannerRpc implements SpannerRpc {
   private final String projectName;
   private final SpannerMetadataProvider metadataProvider;
   private final CallCredentialsProvider callCredentialsProvider;
+  private final String compressorName;
   private final Duration waitTimeout =
       systemProperty(PROPERTY_TIMEOUT_SECONDS, DEFAULT_TIMEOUT_SECONDS);
   private final Duration idleTimeout =
@@ -279,6 +280,7 @@ public class GapicSpannerRpc implements SpannerRpc {
             mergedHeaderProvider.getHeaders(),
             internalHeaderProviderBuilder.getResourceHeaderKey());
     this.callCredentialsProvider = options.getCallCredentialsProvider();
+    this.compressorName = options.getCompressorName();
 
     // Create a managed executor provider.
     this.executorProvider =
@@ -1238,6 +1240,9 @@ public class GapicSpannerRpc implements SpannerRpc {
         context =
             context.withCallOptions(context.getCallOptions().withCallCredentials(callCredentials));
       }
+    }
+    if (compressorName != null) {
+      context = context.withCallOptions(context.getCallOptions().withCompression(compressorName));
     }
     return context.withStreamWaitTimeout(waitTimeout).withStreamIdleTimeout(idleTimeout);
   }
